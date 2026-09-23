@@ -1,143 +1,339 @@
-<!DOCTYPE html>
-<html lang="fr">
+```js
+const audio = document.getElementById("bell");
+const enabled = document.getElementById("enabled");
+const mode = document.getElementById("mode");
+const customTime = document.getElementById("customTime");
+const customSettings = document.getElementById("customSettings");
+const clock = document.getElementById("clock");
+const status = document.getElementById("status");
+const nextBell = document.getElementById("nextBell");
+const testButton = document.getElementById("testButton");
 
-<head>
-  <meta charset="UTF-8">
+let lastPlayed = "";
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0">
 
-  <title>Sonnerie Collège Alfred Mézières</title>
+/* =========================
+   HORLOGE
+========================= */
 
-  <link
-    rel="stylesheet"
-    href="style.css">
-</head>
+function updateClock() {
+  const now = new Date();
 
-<body>
+  const h = String(now.getHours()).padStart(2, "0");
+  const m = String(now.getMinutes()).padStart(2, "0");
+  const s = String(now.getSeconds()).padStart(2, "0");
 
-  <main class="container">
+  clock.textContent = `${h}:${m}:${s}`;
+}
 
-    <div class="card">
 
-      <div class="bell-icon">
-        🔔
-      </div>
+/* =========================
+   JOUER LA SONNERIE
+========================= */
 
-      <h1>
-        Sonnerie Collège Alfred Mézières
-      </h1>
+function playBell() {
 
-      <p class="description">
-        Système de sonnerie automatique
-      </p>
+  audio.pause();
 
-      <div
-        id="clock"
-        class="clock">
-        00:00:00
-      </div>
+  audio.currentTime = 0;
 
-      <div
-        id="status"
-        class="status off">
-        🔴 Sonnerie désactivée
-      </div>
+  audio.play()
+    .then(() => {
 
-      <div class="settings">
+      console.log("Sonnerie lancée");
 
-        <label class="switch-row">
+    })
+    .catch((error) => {
 
-          <span>
-            Activer la sonnerie
-          </span>
+      console.error("Erreur audio :", error);
 
-          <input
-            type="checkbox"
-            id="enabled">
+      status.textContent =
+        "⚠️ Le navigateur bloque le son";
 
-          <span class="switch"></span>
+    });
+}
 
-        </label>
 
-        <label for="mode">
-          Mode de fonctionnement
-        </label>
+/* =========================
+   PROCHAINE SONNERIE
+========================= */
 
-        <select id="mode">
+function getNextBell() {
 
-          <option value="hourly">
-            🔔 Toutes les heures
-          </option>
+  if (!enabled.checked) {
+    return null;
+  }
 
-          <option value="custom">
-            🕐 Heure précise
-          </option>
+  const now = new Date();
+  const next = new Date(now);
 
-        </select>
+  /* Toutes les heures */
 
-        <div
-          id="customSettings"
-          class="hidden">
+  if (mode.value === "hourly") {
 
-          <label for="customTime">
-            Heure de la sonnerie
-          </label>
+    next.setMinutes(0);
+    next.setSeconds(0);
+    next.setMilliseconds(0);
 
-          <input
-            type="time"
-            id="customTime"
-            value="08:00">
+    if (next <= now) {
+      next.setHours(next.getHours() + 1);
+    }
 
-        </div>
+    return next;
+  }
 
-        <button
-          id="testButton"
-          type="button">
 
-          🔊 Tester la sonnerie
+  /* Heure précise */
 
-        </button>
+  if (!customTime.value) {
+    return null;
+  }
 
-      </div>
+  const [hours, minutes] =
+    customTime.value.split(":").map(Number);
 
-      <div class="next-bell">
+  next.setHours(hours);
+  next.setMinutes(minutes);
+  next.setSeconds(0);
+  next.setMilliseconds(0);
 
-        <span>
-          Prochaine sonnerie
-        </span>
+  if (next <= now) {
+    next.setDate(next.getDate() + 1);
+  }
 
-        <strong id="nextBell">
-          —
-        </strong>
+  return next;
+}
 
-      </div>
 
-      <p class="warning">
+/* =========================
+   AFFICHER LA PROCHAINE
+========================= */
 
-        ⚠️ Garde cette page ouverte pour que la
-        sonnerie puisse fonctionner.
+function updateNextBell() {
 
-        Clique d'abord sur
-        « Tester la sonnerie »
-        pour autoriser le navigateur à jouer le son.
+  const next = getNextBell();
 
-      </p>
+  if (!next) {
 
-    </div>
+    nextBell.textContent = "—";
 
-  </main>
+    return;
+  }
 
-  <audio
-    id="bell"
-    src="Sonnerie Collège Alfred Mézières.webm"
-    preload="auto">
-  </audio>
+  const now = new Date();
 
-  <script src="script.js"></script>
+  const difference =
+    Math.max(0, next - now);
 
-</body>
+  const totalSeconds =
+    Math.ceil(difference / 1000);
 
-</html>
+  const hours =
+    Math.floor(totalSeconds / 3600);
+
+  const minutes =
+    Math.floor(
+      (totalSeconds % 3600) / 60
+    );
+
+  const seconds =
+    totalSeconds % 60;
+
+  const nextTime =
+    `${String(next.getHours()).padStart(2, "0")}:` +
+    `${String(next.getMinutes()).padStart(2, "0")}`;
+
+  nextBell.textContent =
+    `${nextTime} — dans ` +
+    `${String(hours).padStart(2, "0")}:` +
+    `${String(minutes).padStart(2, "0")}:` +
+    `${String(seconds).padStart(2, "0")}`;
+}
+
+
+/* =========================
+   VÉRIFIER LA SONNERIE
+========================= */
+
+function checkBell() {
+
+  if (!enabled.checked) {
+    return;
+  }
+
+  const now = new Date();
+
+  const hours = now.getHours();
+  const minutes = now.getMinutes();
+  const seconds = now.getSeconds();
+
+  let shouldPlay = false;
+  let key = "";
+
+
+  /* TOUTES LES HEURES */
+
+  if (mode.value === "hourly") {
+
+    shouldPlay =
+      minutes === 0 &&
+      seconds === 0;
+
+    key =
+      `${now.getFullYear()}-` +
+      `${now.getMonth()}-` +
+      `${now.getDate()}-` +
+      `${hours}`;
+  }
+
+
+  /* HEURE PRÉCISE */
+
+  else {
+
+    if (!customTime.value) {
+      return;
+    }
+
+    const [customHours, customMinutes] =
+      customTime.value.split(":").map(Number);
+
+    shouldPlay =
+      hours === customHours &&
+      minutes === customMinutes &&
+      seconds === 0;
+
+    key =
+      `${now.getFullYear()}-` +
+      `${now.getMonth()}-` +
+      `${now.getDate()}-` +
+      `${customTime.value}`;
+  }
+
+
+  /* ÉVITER LES DOUBLES SONNERIES */
+
+  if (
+    shouldPlay &&
+    key !== lastPlayed
+  ) {
+
+    lastPlayed = key;
+
+    playBell();
+  }
+}
+
+
+/* =========================
+   ACTIVATION
+========================= */
+
+enabled.addEventListener("change", function () {
+
+  if (enabled.checked) {
+
+    status.textContent =
+      "🟢 Sonnerie activée";
+
+    status.className =
+      "status on";
+
+    updateNextBell();
+
+  } else {
+
+    status.textContent =
+      "🔴 Sonnerie désactivée";
+
+    status.className =
+      "status off";
+
+    audio.pause();
+
+    audio.currentTime = 0;
+
+    nextBell.textContent = "—";
+  }
+});
+
+
+/* =========================
+   CHANGEMENT DE MODE
+========================= */
+
+mode.addEventListener("change", function () {
+
+  if (mode.value === "custom") {
+
+    customSettings.classList.remove("hidden");
+
+  } else {
+
+    customSettings.classList.add("hidden");
+  }
+
+  updateNextBell();
+});
+
+
+/* =========================
+   CHANGEMENT D'HEURE
+========================= */
+
+customTime.addEventListener("change", function () {
+
+  updateNextBell();
+});
+
+
+/* =========================
+   TEST DE LA SONNERIE
+========================= */
+
+testButton.addEventListener("click", function () {
+
+  /*
+    Le bouton de test sert uniquement
+    à tester le son.
+
+    Il ne change pas l'activation.
+  */
+
+  playBell();
+});
+
+
+/* =========================
+   DÉMARRAGE
+========================= */
+
+enabled.checked = false;
+
+status.textContent =
+  "🔴 Sonnerie désactivée";
+
+status.className =
+  "status off";
+
+customSettings.classList.add("hidden");
+
+nextBell.textContent = "—";
+
+updateClock();
+
+
+/* =========================
+   BOUCLE PRINCIPALE
+========================= */
+
+setInterval(function () {
+
+  updateClock();
+
+  checkBell();
+
+  updateNextBell();
+
+}, 250);
 ```
