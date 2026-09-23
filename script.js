@@ -1,3 +1,4 @@
+```js
 const audio = document.getElementById("bell");
 const enabled = document.getElementById("enabled");
 const mode = document.getElementById("mode");
@@ -10,341 +11,232 @@ const testButton = document.getElementById("testButton");
 
 let lastPlayed = "";
 
-/* =========================
-AFFICHAGE DE L'HEURE
-========================= */
+
+/* HORLOGE */
 
 function updateClock() {
+  const now = new Date();
 
-const now = new Date();
-
-const hours =
-String(now.getHours()).padStart(2, "0");
-
-const minutes =
-String(now.getMinutes()).padStart(2, "0");
-
-const seconds =
-String(now.getSeconds()).padStart(2, "0");
-
-clock.textContent =
-`${hours}:${minutes}:${seconds}`;
+  clock.textContent =
+    String(now.getHours()).padStart(2, "0") + ":" +
+    String(now.getMinutes()).padStart(2, "0") + ":" +
+    String(now.getSeconds()).padStart(2, "0");
 }
 
-/* =========================
-JOUER LA SONNERIE
-========================= */
+
+/* JOUER LA SONNERIE */
 
 function playBell() {
+  audio.pause();
+  audio.currentTime = 0;
 
-audio.pause();
+  audio.play()
+    .then(() => {
+      console.log("Sonnerie lancée");
+    })
+    .catch((error) => {
+      console.error("Erreur audio :", error);
 
-audio.currentTime = 0;
-
-audio.play()
-.then(() => {
-
-```
-  console.log("Sonnerie lancée");
-
-})
-.catch((error) => {
-
-  console.error(
-    "Impossible de jouer la sonnerie :",
-    error
-  );
-
-  status.textContent =
-    "⚠️ Clique d'abord sur « Tester la sonnerie »";
-
-  status.className =
-    "status off";
-
-});
-```
-
+      status.textContent = "⚠️ Impossible de jouer le son";
+      status.className = "status off";
+    });
 }
 
-/* =========================
-CHANGER LE MODE
-========================= */
 
-function updateMode() {
-
-if (mode.value === "custom") {
-
-```
-customSettings.classList.remove(
-  "hidden"
-);
-```
-
-} else {
-
-```
-customSettings.classList.add(
-  "hidden"
-);
-```
-
-}
-
-updateNextBell();
-}
-
-/* =========================
-PROCHAINE SONNERIE
-========================= */
+/* PROCHAINE SONNERIE */
 
 function getNextBell() {
+  if (!enabled.checked) {
+    return null;
+  }
 
-if (!enabled.checked) {
+  const now = new Date();
+  const next = new Date(now);
 
-```
-return null;
-```
+  if (mode.value === "hourly") {
+    next.setMinutes(0);
+    next.setSeconds(0);
+    next.setMilliseconds(0);
 
+    if (next <= now) {
+      next.setHours(next.getHours() + 1);
+    }
+
+    return next;
+  }
+
+  if (!customTime.value) {
+    return null;
+  }
+
+  const [hours, minutes] = customTime.value.split(":").map(Number);
+
+  next.setHours(hours);
+  next.setMinutes(minutes);
+  next.setSeconds(0);
+  next.setMilliseconds(0);
+
+  if (next <= now) {
+    next.setDate(next.getDate() + 1);
+  }
+
+  return next;
 }
 
-const now = new Date();
 
-const next = new Date(now);
-
-/* Toutes les heures */
-
-if (mode.value === "hourly") {
-
-```
-next.setMinutes(0);
-
-next.setSeconds(0);
-
-next.setMilliseconds(0);
-
-if (next <= now) {
-
-  next.setHours(
-    next.getHours() + 1
-  );
-
-}
-
-return next;
-```
-
-}
-
-/* Heure précise */
-
-if (!customTime.value) {
-
-```
-return null;
-```
-
-}
-
-const parts =
-customTime.value.split(":");
-
-const hours =
-Number(parts[0]);
-
-const minutes =
-Number(parts[1]);
-
-next.setHours(
-hours,
-minutes,
-0,
-0
-);
-
-if (next <= now) {
-
-```
-next.setDate(
-  next.getDate() + 1
-);
-```
-
-}
-
-return next;
-}
-
-/* =========================
-AFFICHER LA PROCHAINE
-SONNERIE
-========================= */
+/* AFFICHER LA PROCHAINE SONNERIE */
 
 function updateNextBell() {
+  const next = getNextBell();
 
-const next =
-getNextBell();
+  if (!next) {
+    nextBell.textContent = "—";
+    return;
+  }
 
-if (!next) {
+  const now = new Date();
 
-```
-nextBell.textContent =
-  "—";
+  const secondsLeft = Math.ceil(
+    (next - now) / 1000
+  );
 
-return;
-```
+  const hours = Math.floor(secondsLeft / 3600);
 
+  const minutes = Math.floor(
+    (secondsLeft % 3600) / 60
+  );
+
+  const seconds = secondsLeft % 60;
+
+  const nextTime =
+    String(next.getHours()).padStart(2, "0") + ":" +
+    String(next.getMinutes()).padStart(2, "0");
+
+  nextBell.textContent =
+    `${nextTime} — dans ` +
+    `${String(hours).padStart(2, "0")}:` +
+    `${String(minutes).padStart(2, "0")}:` +
+    `${String(seconds).padStart(2, "0")}`;
 }
 
-const now = new Date();
 
-const difference =
-Math.max(
-0,
-next - now
-);
-
-const totalSeconds =
-Math.ceil(
-difference / 1000
-);
-
-const hours =
-Math.floor(
-totalSeconds / 3600
-);
-
-const minutes =
-Math.floor(
-(totalSeconds % 3600) / 60
-);
-
-const seconds =
-totalSeconds % 60;
-
-const nextTime =
-`${String(next.getHours()).padStart(2, "0")}:` +
-`${String(next.getMinutes()).padStart(2, "0")}`;
-
-nextBell.textContent =
-`${nextTime} — dans ` +
-`${String(hours).padStart(2, "0")}:` +
-`${String(minutes).padStart(2, "0")}:` +
-`${String(seconds).padStart(2, "0")}`;
-}
-
-/* =========================
-VÉRIFICATION DE LA SONNERIE
-========================= */
+/* VÉRIFIER LA SONNERIE */
 
 function checkBell() {
+  if (!enabled.checked) {
+    return;
+  }
 
-/* Si désactivée : rien */
+  const now = new Date();
 
-if (!enabled.checked) {
+  const hours = now.getHours();
+  const minutes = now.getMinutes();
+  const seconds = now.getSeconds();
 
-```
-return;
-```
+  let shouldPlay = false;
+  let key = "";
 
-}
+  if (mode.value === "hourly") {
 
-const now = new Date();
+    shouldPlay =
+      minutes === 0 &&
+      seconds === 0;
 
-const hours =
-now.getHours();
+    key =
+      `${now.getFullYear()}-` +
+      `${now.getMonth()}-` +
+      `${now.getDate()}-` +
+      `${hours}`;
 
-const minutes =
-now.getMinutes();
+  } else {
 
-const seconds =
-now.getSeconds();
+    if (!customTime.value) {
+      return;
+    }
 
-let shouldPlay = false;
+    const [customHours, customMinutes] =
+      customTime.value.split(":").map(Number);
 
-let key = "";
+    shouldPlay =
+      hours === customHours &&
+      minutes === customMinutes &&
+      seconds === 0;
 
-/* =========================
-TOUTES LES HEURES
-========================= */
+    key =
+      `${now.getFullYear()}-` +
+      `${now.getMonth()}-` +
+      `${now.getDate()}-` +
+      `${customTime.value}`;
+  }
 
-if (mode.value === "hourly") {
-
-```
-shouldPlay =
-  minutes === 0 &&
-  seconds === 0;
-
-
-key =
-  `${now.getFullYear()}-` +
-  `${now.getMonth()}-` +
-  `${now.getDate()}-` +
-  `${hours}`;
-```
-
-}
-
-/* =========================
-HEURE PRÉCISE
-========================= */
-
-else {
-
-```
-if (!customTime.value) {
-
-  return;
-
+  if (shouldPlay && key !== lastPlayed) {
+    lastPlayed = key;
+    playBell();
+  }
 }
 
 
-const [customHours, customMinutes] =
-  customTime.value
-    .split(":")
-    .map(Number);
+/* ACTIVATION */
+
+enabled.addEventListener("change", function () {
+
+  if (enabled.checked) {
+
+    status.textContent =
+      "🟢 Sonnerie activée";
+
+    status.className =
+      "status on";
+
+    updateNextBell();
+
+  } else {
+
+    status.textContent =
+      "🔴 Sonnerie désactivée";
+
+    status.className =
+      "status off";
+
+    audio.pause();
+    audio.currentTime = 0;
+
+    nextBell.textContent = "—";
+  }
+});
 
 
-shouldPlay =
-  hours === customHours &&
-  minutes === customMinutes &&
-  seconds === 0;
+/* CHANGEMENT DE MODE */
+
+mode.addEventListener("change", function () {
+
+  if (mode.value === "custom") {
+    customSettings.classList.remove("hidden");
+  } else {
+    customSettings.classList.add("hidden");
+  }
+
+  updateNextBell();
+});
 
 
-key =
-  `${now.getFullYear()}-` +
-  `${now.getMonth()}-` +
-  `${now.getDate()}-` +
-  `${customTime.value}`;
-```
+/* CHANGEMENT D'HEURE */
 
-}
+customTime.addEventListener("change", function () {
+  updateNextBell();
+});
 
-/* Évite les répétitions */
 
-if (
-shouldPlay &&
-key !== lastPlayed
-) {
+/* TEST DE LA SONNERIE */
 
-```
-lastPlayed = key;
+testButton.addEventListener("click", function () {
 
-playBell();
-```
+  /*
+    Le bouton de test active maintenant
+    automatiquement la sonnerie.
+  */
 
-}
-}
-
-/* =========================
-BOUTON ACTIVATION
-========================= */
-
-enabled.addEventListener(
-"change",
-function () {
-
-```
-if (enabled.checked) {
+  enabled.checked = true;
 
   status.textContent =
     "🟢 Sonnerie activée";
@@ -352,127 +244,36 @@ if (enabled.checked) {
   status.className =
     "status on";
 
-  /*
-    Charge le fichier audio.
-  */
+  updateNextBell();
 
-  audio.load();
+  playBell();
+});
 
-} else {
 
-  status.textContent =
-    "🔴 Sonnerie désactivée";
-
-  status.className =
-    "status off";
-
-  /*
-    Arrête immédiatement
-    une éventuelle sonnerie.
-  */
-
-  audio.pause();
-
-  audio.currentTime = 0;
-
-  nextBell.textContent =
-    "—";
-}
-
-updateNextBell();
-```
-
-}
-);
-
-/* =========================
-CHANGEMENT DE MODE
-========================= */
-
-mode.addEventListener(
-"change",
-updateMode
-);
-
-/* =========================
-CHANGEMENT D'HEURE
-========================= */
-
-customTime.addEventListener(
-"change",
-function () {
-
-```
-updateNextBell();
-```
-
-}
-);
-
-/* =========================
-TEST DE LA SONNERIE
-========================= */
-
-testButton.addEventListener(
-"click",
-function () {
-
-```
-playBell();
-```
-
-}
-);
-
-/* =========================
-MISE À JOUR
-========================= */
-
-function update() {
-
-updateClock();
-
-checkBell();
-
-updateNextBell();
-
-}
-
-/* =========================
-DÉMARRAGE
-========================= */
-
-/*
-IMPORTANT :
-La sonnerie est désactivée
-au démarrage.
-*/
+/* DÉMARRAGE */
 
 enabled.checked = false;
 
 status.textContent =
-"🔴 Sonnerie désactivée";
+  "🔴 Sonnerie désactivée";
 
 status.className =
-"status off";
+  "status off";
 
-customSettings.classList.add(
-"hidden"
-);
+customSettings.classList.add("hidden");
 
-nextBell.textContent =
-"—";
+nextBell.textContent = "—";
 
 updateClock();
 
-updateNextBell();
 
-/*
-Vérifie régulièrement
-l'heure.
-*/
+/* MISE À JOUR */
 
-setInterval(
-update,
-250
-);
+setInterval(function () {
+
+  updateClock();
+  checkBell();
+  updateNextBell();
+
+}, 250);
+```
