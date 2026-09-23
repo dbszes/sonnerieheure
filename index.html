@@ -1,13 +1,13 @@
+```html
 <!DOCTYPE html>
-
 <html lang="fr">
 
 <head>
   <meta charset="UTF-8">
 
-<meta
- name="viewport"
- content="width=device-width, initial-scale=1.0">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0">
 
   <title>Sonnerie Collège Alfred Mézières</title>
 
@@ -20,130 +20,125 @@
 
   <main class="container">
 
-```
-<div class="card">
+    <div class="card">
 
-  <div class="bell-icon">
-    🔔
-  </div>
+      <div class="bell-icon">
+        🔔
+      </div>
 
-  <h1>
-    Sonnerie Collège Alfred Mézières
-  </h1>
+      <h1>
+        Sonnerie Collège Alfred Mézières
+      </h1>
 
-  <p class="description">
-    Système de sonnerie automatique
-  </p>
+      <p class="description">
+        Système de sonnerie automatique
+      </p>
 
-  <div
-    id="clock"
-    class="clock">
-    00:00:00
-  </div>
+      <div
+        id="clock"
+        class="clock">
+        00:00:00
+      </div>
 
-  <div
-    id="status"
-    class="status off">
-    🔴 Sonnerie désactivée
-  </div>
+      <div
+        id="status"
+        class="status off">
+        🔴 Sonnerie désactivée
+      </div>
 
-  <div class="settings">
+      <div class="settings">
 
-    <label class="switch-row">
+        <label class="switch-row">
 
-      <span>
-        Activer la sonnerie
-      </span>
+          <span>
+            Activer la sonnerie
+          </span>
 
-      <input
-        type="checkbox"
-        id="enabled">
+          <input
+            type="checkbox"
+            id="enabled">
 
-      <span class="switch"></span>
+          <span class="switch"></span>
 
-    </label>
+        </label>
 
+        <label for="mode">
+          Mode de fonctionnement
+        </label>
 
-    <label for="mode">
-      Mode de fonctionnement
-    </label>
+        <select id="mode">
 
-    <select id="mode">
+          <option value="hourly">
+            🔔 Toutes les heures
+          </option>
 
-      <option value="hourly">
-        🔔 Toutes les heures
-      </option>
+          <option value="custom">
+            🕐 Heure précise
+          </option>
 
-      <option value="custom">
-        🕐 Heure précise
-      </option>
+        </select>
 
-    </select>
+        <div
+          id="customSettings"
+          class="hidden">
 
+          <label for="customTime">
+            Heure de la sonnerie
+          </label>
 
-    <div
-      id="customSettings"
-      class="hidden">
+          <input
+            type="time"
+            id="customTime"
+            value="08:00">
 
-      <label for="customTime">
-        Heure de la sonnerie
-      </label>
+        </div>
 
-      <input
-        type="time"
-        id="customTime"
-        value="08:00">
+        <button
+          id="testButton"
+          type="button">
+
+          🔊 Tester la sonnerie
+
+        </button>
+
+      </div>
+
+      <div class="next-bell">
+
+        <span>
+          Prochaine sonnerie
+        </span>
+
+        <strong id="nextBell">
+          —
+        </strong>
+
+      </div>
+
+      <p class="warning">
+
+        ⚠️ Garde cette page ouverte pour que la
+        sonnerie puisse fonctionner.
+
+        Clique d'abord sur
+        « Tester la sonnerie »
+        pour autoriser le navigateur à jouer le son.
+
+      </p>
 
     </div>
 
-
-    <button
-      id="testButton"
-      type="button">
-
-      🔊 Tester la sonnerie
-
-    </button>
-
-  </div>
-
-
-  <div class="next-bell">
-
-    <span>
-      Prochaine sonnerie
-    </span>
-
-    <strong id="nextBell">
-      —
-    </strong>
-
-  </div>
-
-
-  <p class="warning">
-
-    ⚠️ Garde cette page ouverte pour que la
-    sonnerie puisse fonctionner.
-
-    Clique d'abord sur
-    « Tester la sonnerie »
-    pour autoriser le navigateur à jouer le son.
-
-  </p>
-
-</div>
-```
-
   </main>
 
-<audio
- id="bell"
- src="Sonnerie Collège Alfred Mézières.webm"
- preload="auto"> </audio>
+  <audio
+    id="bell"
+    src="Sonnerie Collège Alfred Mézières.webm"
+    preload="auto">
+  </audio>
 
   <script src="script.js"></script>
 
 </body>
 
 </html>
+```
