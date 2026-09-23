@@ -1,106 +1,149 @@
 <!DOCTYPE html>
 
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#111827">
-  <title>Sonnerie horaire</title>
-  <link rel="stylesheet" href="style.css">
+
+<meta
+ name="viewport"
+ content="width=device-width, initial-scale=1.0">
+
+  <title>Sonnerie Collège Alfred Mézières</title>
+
+  <link
+    rel="stylesheet"
+    href="style.css">
 </head>
 
 <body>
-  <main class="app">
-    <section class="card">
+
+  <main class="container">
 
 ```
-  <div class="badge">🔔 SONNERIE</div>
+<div class="card">
 
-  <h1>Sonnerie horaire</h1>
-
-  <p class="subtitle">
-    Lance <strong>sonnerie.webm</strong> automatiquement selon ton réglage.
-  </p>
-
-  <div class="clock" id="clock">--:--:--</div>
-
-  <div class="status" id="status">
-    Désactivée
+  <div class="bell-icon">
+    🔔
   </div>
 
-  <div class="controls">
+  <h1>
+    Sonnerie Collège Alfred Mézières
+  </h1>
+
+  <p class="description">
+    Système de sonnerie automatique
+  </p>
+
+  <div
+    id="clock"
+    class="clock">
+    00:00:00
+  </div>
+
+  <div
+    id="status"
+    class="status off">
+    🔴 Sonnerie désactivée
+  </div>
+
+  <div class="settings">
 
     <label class="switch-row">
-      <span>Activer la sonnerie</span>
 
-      <input type="checkbox" id="enabled">
+      <span>
+        Activer la sonnerie
+      </span>
+
+      <input
+        type="checkbox"
+        id="enabled">
 
       <span class="switch"></span>
+
     </label>
 
-    <div class="settings">
 
-      <label for="mode">Mode</label>
+    <label for="mode">
+      Mode de fonctionnement
+    </label>
 
-      <select id="mode">
-        <option value="hourly">
-          Toutes les heures
-        </option>
+    <select id="mode">
 
-        <option value="custom">
-          Heure précise
-        </option>
-      </select>
+      <option value="hourly">
+        🔔 Toutes les heures
+      </option>
 
-      <label
-        for="customTime"
-        id="customLabel"
-        class="hidden">
-        Heure de sonnerie
+      <option value="custom">
+        🕐 Heure précise
+      </option>
+
+    </select>
+
+
+    <div
+      id="customSettings"
+      class="hidden">
+
+      <label for="customTime">
+        Heure de la sonnerie
       </label>
 
       <input
         type="time"
         id="customTime"
-        class="hidden"
         value="08:00">
+
     </div>
+
 
     <button
       id="testButton"
-      class="secondary">
-      ▶ Tester la sonnerie
+      type="button">
+
+      🔊 Tester la sonnerie
+
     </button>
 
   </div>
 
-  <div class="next">
-    <span>Prochaine sonnerie</span>
+
+  <div class="next-bell">
+
+    <span>
+      Prochaine sonnerie
+    </span>
 
     <strong id="nextBell">
       —
     </strong>
+
   </div>
 
-  <p class="hint">
-    ⚠️ Garde cette page ouverte.
-    Pour autoriser la lecture automatique du son,
-    clique une fois sur « Tester la sonnerie ».
+
+  <p class="warning">
+
+    ⚠️ Garde cette page ouverte pour que la
+    sonnerie puisse fonctionner.
+
+    Clique d'abord sur
+    « Tester la sonnerie »
+    pour autoriser le navigateur à jouer le son.
+
   </p>
 
-</section>
+</div>
 ```
 
   </main>
 
-  <!-- Place sonnerie.webm dans le même dossier que ce fichier -->
-
 <audio
  id="bell"
- src="sonnerie.webm"
+ src="Sonnerie Collège Alfred Mézières.webm"
  preload="auto"> </audio>
 
   <script src="script.js"></script>
 
 </body>
+
 </html>
